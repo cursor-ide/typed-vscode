@@ -1,14 +1,15 @@
-# Deno
-deno.lock
-.deno/
+# environment variables
+.env
+.env.local
+.env.test
 
-# IDE
-.vscode/
-.idea/
+# vscode
+.vscode
 
-# OS
-.DS_Store
-Thumbs.db
+# windsurf
+.windsurf
+biome.json
 
-# Logs
-*.log
+# node
+node_modules
+bun.lock
