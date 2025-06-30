@@ -1,0 +1,25 @@
+{
+  "name": "@typed/vscode",
+  "version": "1.96.0",
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "tasks": {
+    "check": "deno check mod.ts",
+    "test": "deno test --allow-read tests/",
+    "lint": "deno lint",
+    "fix": "deno lint --fix",
+    "fmt": "deno fmt",
+    "update": "deno run --allow-all ../../scripts/update-types.ts"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.0",
+    "@std/path": "jsr:@std/path@^1.0.0"
+  },
+  "publish": {
+    "exclude": [
+      "tests/",
+      "scripts/"
+    ]
+  }
+}

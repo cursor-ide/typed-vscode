@@ -1,0 +1,60 @@
+name: Sync types
+
+on:
+  schedule:
+    - cron: "0 3 * * *" # run daily at 03:00 UTC
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Update types from upstream
+        run: deno task update
+
+      - name: Type check updated types
+        run: deno task check
+
+      - name: Lint code
+        run: deno task lint
+
+      - name: Format code
+        run: deno task fmt
+
+      - name: Run tests
+        run: deno task test
+
+      - name: Security scan
+        run: deno task security
+
+      - name: Validate JSR package
+        run: deno task publish-dry
+
+      - name: Commit changes if any
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add -A
+            VERSION=$(jq -r .version jsr.json)
+            git commit -m "chore: sync types → v$VERSION"
+            git push origin HEAD
+          else
+            echo "No changes to commit."
+          fi
+
+      - name: Publish to JSR
+        if: success() && github.ref == 'refs/heads/main'
+        run: npx jsr publish

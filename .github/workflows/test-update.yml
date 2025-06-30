@@ -1,0 +1,42 @@
+name: Test Sync types (Local Testing)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: denoland/setup-deno@v1
+        with:
+          deno-version: v1.x
+
+      - name: Run deno task sync (safe)
+        run: deno task sync
+
+      - name: Check for changes (dry-run)
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "✅ Changes detected:"
+            git status --porcelain
+            echo "🔍 Would commit these files with message:"
+            VERSION=$(jq -r .version jsr.json)
+            echo "chore: sync types → v$VERSION"
+            echo "🚫 DRY RUN - No actual commit/push performed"
+          else
+            echo "✅ No changes detected - repository is up to date"
+          fi
+
+      - name: Validate publication readiness
+        run: |
+          echo "🔍 Testing JSR publication readiness..."
+          deno task publish-dry
+          echo "✅ Package is ready for publication"
