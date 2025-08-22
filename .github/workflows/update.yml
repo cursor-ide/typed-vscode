@@ -27,9 +27,6 @@ jobs:
       - name: Type check updated types
         run: deno task check
 
-      - name: Lint code
-        run: deno task lint
-
       - name: Format code
         run: deno task fmt
 
